@@ -3,8 +3,6 @@ import requests
 import json
 from openpyxl import Workbook
 from openpyxl.styles import Font
-import pandas as pd
-
 
 
 
@@ -28,7 +26,11 @@ jira_items = {
     "Created_Time" : [],
     "Creator" : [],
     "Status" : [],
-    "Summary" : []
+    "Summary" : [],
+    "FixVersions":[],
+    "Changelog":[],
+    "Assignee": [],
+    "Reporter":[]
 }
 
 
@@ -55,16 +57,8 @@ for base in search_results:
         jira_items["Creator"].append(item["fields"]["creator"]["displayName"])
         jira_items["Status"].append(item["fields"]["status"]["name"])
         jira_items["Summary"].append(item["fields"]["summary"])
-    print("adding")
-"""
-df = pd.DataFrame(data=jira_items, index=[0])
-print("deb")
-df = (df.T)
-print("bed")
-print (df)
 
-df.to_excel('dict1.xlsx')
-"""
+
 wb = Workbook()
 ws = wb.active
 
@@ -74,7 +68,7 @@ created_time_row = 2
 creator_row = 2
 status_row = 2
 summary_row = 2
-# changelog_row=2
+changelog_row=2
 
 
 start_column = 1
@@ -93,7 +87,7 @@ ws["D1"].font = font
 ws["E1"].font = font
 ws["F1"].font = font
 ws.print_title_rows = '1:1'
-print(total)
+print(f'There is total {total} issues')
 
 for key in jira_items["Key"]:
     ws.cell(row=key_row, column=start_column).value = key
@@ -114,14 +108,13 @@ for status in jira_items["Status"]:
 for summary in jira_items["Summary"]:
     ws.cell(row=summary_row, column=start_column + 5).value = summary
     summary_row += 1
-
-# for changelog in change_log_list:
-# ws.cell (row=changelog_row, column=start_column+6).value=changelog
-# changelog_row += 1
-print("debug_final")
+for changelog in jira_items["Changelog"]:
+    ws.cell (row=changelog_row, column=start_column+6).value=changelog
+    changelog_row += 1
+print("Items are added to Excel File!")
 
 wb.save("jira-report.xlsx")
-
+print("Excel File is saved!")
 
 
 
